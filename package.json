@@ -1,0 +1,13 @@
+{
+    "name": "JSON_TO_CSV",
+    "version": "0.0.0",
+    "private": true,
+    "scripts": {
+        "start": "node app.js"
+    },
+    "dependencies": {
+        "csv-write-stream": "",
+        "express": "~4.9.0",
+        "request": ""
+    }
+}
