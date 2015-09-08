@@ -65,7 +65,8 @@ function writeCSVFile(body) {
 }
 
 function loadData() {
-    var dataUrl = "http://semantictec.com/message/consume?topic=pc.subjectactivity.sendpcrecs&size=100000&consumerGroup=test-group&timeout=10";
+    var dataUrl = "http://semantictec.com/message/consume?topic=pc.subjectactivity.sendpcrecs&size=100000&consumerGroup=test-group&timeout=10",
+        data = [];
 
     // exec('curl ' + dataUrl, {
     //     maxBuffer: 1024 * 10240000
@@ -81,7 +82,7 @@ function loadData() {
     // })
     request(dataUrl, function(error, response, body) {
         if (!error && response.statusCode == 200) {
-            body = JSON.parse(body);
+            data = JSON.parse(body);
             console.log("success", body.length)
             data.forEach(function(url, index) {
                 data[index].value = JSON.parse(data[index].value);
