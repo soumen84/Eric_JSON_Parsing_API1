@@ -41,12 +41,28 @@ function writeCSVFile(body) {
     });
     writer.pipe(fs.createWriteStream('sample_predicted_data.csv'));
     body.forEach(function(item, itemIndex) {
+        console.log("itemIndex", itemIndex);
         data = [];
+
         fields.forEach(function(fieldName, index) {
-            if (eval('item.' + fieldName)) {
-                data.push(eval('item.' + fieldName));
-            } else {
+            var path = fieldName.split('.'),
+                flag = 0,
+                shortPath = "";
+            path.forEach(function(pathName, pathIndex) {
+                if (pathIndex === 0) {
+                    shortPath = shortPath + pathName;
+                } else {
+                    shortPath = shortPath + "." + pathName;
+                }
+                if (!eval('item.' + shortPath)) {
+                    flag = 1;
+                    return false;
+                }
+            })
+            if (flag === 1) {
                 data.push('');
+            } else {
+                data.push(eval('item.' + fieldName));
             }
         })
         writer.write(data);
@@ -57,7 +73,7 @@ function writeCSVFile(body) {
 }
 
 function loadData() {
-    var dataUrl = "http://semantictec.com/message/consume?topic=pc.subjectactivity.sendpcrecs&size=1&consumerGroup=test-group&timeout=10",
+    var dataUrl = "http://semantictec.com/message/consume?topic=pc.subjectactivity.sendpcrecs&size=10000&consumerGroup=test-group&timeout=10",
         data = [];
 
     // exec('curl ' + dataUrl, {
@@ -79,6 +95,7 @@ function loadData() {
                 console.log('JSON write complete');
             });
             data = JSON.parse(body);
+            console.log("data length", data.length);
             data.forEach(function(eachData, index) {
                 data[index].value = JSON.parse(data[index].value);
             })
@@ -91,7 +108,7 @@ function loadData() {
 
 loadData();
 app.get('/convertData', function(req, res) {
-    var dataUrl = "http://semantictec.com/message/consume?topic=pc.subjectactivity.sendpcrecs&size=10&consumerGroup=test-group&timeout=10";
+    var dataUrl = "http://semantictec.com/message/consume?topic=pc.subjectactivity.sendpcrecs&size=1&consumerGroup=test-group&timeout=10";
 
     // exec('curl ' + dataUrl, {
     //     maxBuffer: 1024 * 10240000
@@ -113,7 +130,7 @@ app.get('/convertData', function(req, res) {
                 body[index].value = JSON.parse(body[index].value);
             })
             res.send({
-                "length": body[8]
+                "length": body[0]
             }); // Send the response of the requested url to the frontend.
         } else {
             console.log("error")
